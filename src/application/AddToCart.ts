@@ -1,11 +1,12 @@
-import { Cart, CartItem } from "../entity/Cart";
+import { Cart } from "../entity/Cart";
+import { CartItem } from "../entity/CartItem";
 import { User } from "../entity/user";
 import { CartGateway, UserCartGateway, UserGateway } from "./gateway";
 
 export function createUserInteractor(userGateway: UserGateway) {
   return {
     async create(user: User): Promise<boolean> {
-      const existingUser = await userGateway.findByEmail(user.getEmail());
+      const existingUser = await userGateway.findByEmail(user.email);
       if (existingUser) {
         throw new Error("User already exists");
       }

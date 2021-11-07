@@ -1,4 +1,5 @@
-import { Cart, CartItem } from "../entity/Cart";
+import { Cart } from "../entity/Cart";
+import { CartItem } from "../entity/CartItem";
 import { User } from "../entity/user";
 
 export interface UserGateway {

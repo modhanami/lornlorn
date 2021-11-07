@@ -1,37 +1,32 @@
-import { Cart, CartItem } from "./Cart";
+import { Cart } from "./Cart";
+import { createCartItem } from "./CartItem";
 import { Product } from "./Product";
 import { User } from "./user";
 
-export class UserCart {
-  private user: User;
-  private cart: Cart;
+export interface UserCart {
+  user: User;
+  cart: Cart;
+  addToCart(product: Product, quantity: number): Promise<void>;
+}
 
-  constructor(user: User, cart: Cart) {
-    this.user = user;
-    this.cart = cart;
-  }
+export function createUserCart(user: User, cart: Cart): UserCart {
+  return {
+    user,
+    cart,
+    async addToCart(product: Product, quantity: number): Promise<void> {
+      if (quantity <= 0) {
+        throw new Error("Quantity must be greater than 0");
+      }
 
-  public getUser(): User {
-    return this.user;
-  }
+      const cartItem = cart.items.find(
+        (item) => item.product.name === product.name
+      );
 
-  public getCart(): Cart {
-    return this.cart;
-  }
-
-  public addToCart(product: Product, quantity: number): void {
-    if (quantity <= 0) {
-      throw new Error("Quantity must be greater than 0");
-    }
-
-    const cartItem = this.cart
-      .getItems()
-      .find((item) => item.getProduct().getName() === product.getName());
-
-    if (cartItem) {
-      cartItem.setQuantity(cartItem.getQuantity() + quantity);
-    } else {
-      this.cart.addItem(new CartItem(product, quantity));
-    }
-  }
+      if (cartItem) {
+        cartItem.quantity += quantity;
+      } else {
+        cart.addItem(createCartItem(product, quantity));
+      }
+    },
+  };
 }

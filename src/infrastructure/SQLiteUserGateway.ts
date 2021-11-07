@@ -1,11 +1,11 @@
 import { PrismaClient, User as UserPrisma } from "@prisma/client";
 import { createUserInteractor } from "../application/AddToCart";
 import { UserGateway } from "../application/gateway";
-import { User } from "../entity/user";
+import { createUser, User } from "../entity/user";
 const prisma = new PrismaClient();
 
 function userFromPrisma(user: UserPrisma): User {
-  return new User(user.username, user.password, user.email);
+  return createUser(user.username, user.email, user.password);
 }
 
 const userGateway: UserGateway = {
@@ -38,14 +38,14 @@ const userGateway: UserGateway = {
   },
   async save(user: User): Promise<void> {
     const update = {
-      username: user.getUsername(),
-      password: user.getPasswordHash(),
-      email: user.getEmail(),
+      username: user.username,
+      password: user.password,
+      email: user.email,
     };
 
     await prisma.user.upsert({
       where: {
-        username: user.getUsername(),
+        username: user.username,
       },
       update: update,
       create: update,
