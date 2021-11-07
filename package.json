@@ -1,0 +1,22 @@
+{
+  "name": "lornlorn",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "yarn dev:swc",
+    "dev:swc": "swc ./src --config-file .swcrc -w -d dist",
+    "dev:nodemon": "nodemon dist/index.js"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.51",
+    "@swc/core": "^1.2.106",
+    "chokidar": "^3.5.2",
+    "prisma": "3.4.1",
+    "regenerator-runtime": "^0.13.9",
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@prisma/client": "3.4.1"
+  }
+}
