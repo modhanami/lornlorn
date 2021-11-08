@@ -1,5 +1,5 @@
 import { PrismaClient, User as UserPrisma } from "@prisma/client";
-import { createUserInteractor } from "../application/AddToCart";
+import { createUserInteractor } from "../application/interactor";
 import { UserGateway } from "../application/gateway";
 import { createUser, User } from "../entity/user";
 const prisma = new PrismaClient();
