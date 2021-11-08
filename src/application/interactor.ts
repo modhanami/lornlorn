@@ -6,9 +6,17 @@ import { CartGateway, UserCartGateway, UserGateway } from "./gateway";
 export function createUserInteractor(userGateway: UserGateway) {
   return {
     async create(user: User): Promise<boolean> {
-      const existingUser = await userGateway.findByEmail(user.email);
+      const existingUser = await userGateway.findByUsername(user.username);
       if (existingUser) {
         throw new Error("User already exists");
+      }
+      await userGateway.save(user);
+      return true;
+    },
+    async update(user: User): Promise<boolean> {
+      const existingUser = await userGateway.findByUsername(user.username);
+      if (!existingUser) {
+        throw new Error("User does not exist");
       }
       await userGateway.save(user);
       return true;
@@ -27,7 +35,7 @@ export function createUserInteractor(userGateway: UserGateway) {
 
 export function createCartInteractor(cartGateway: CartGateway) {
   return {
-    async save(cart: Cart): Promise<void> {
+    async create(cart: Cart): Promise<void> {
       await cartGateway.save(cart);
     },
     async findById(id: number): Promise<Cart | null> {
@@ -38,7 +46,11 @@ export function createCartInteractor(cartGateway: CartGateway) {
 
 export function createUserCartInteractor(userCartGateway: UserCartGateway) {
   return {
-    async save(userId: number, cart: Cart): Promise<void> {
+    async create(userId: number, cart: Cart): Promise<void> {
+      const existingUserCart = await userCartGateway.findByUserId(userId);
+      if (existingUserCart) {
+        throw new Error("User already has a cart");
+      }
       await userCartGateway.save(userId, cart);
     },
     async findByUserId(userId: number): Promise<Cart | null> {
