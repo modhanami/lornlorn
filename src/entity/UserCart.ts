@@ -4,6 +4,7 @@ import { Product } from "./Product";
 import { User } from "./user";
 
 export interface UserCart {
+  id?: number;
   user: User;
   cart: Cart;
   addToCart(product: Product, quantity: number): Promise<void>;

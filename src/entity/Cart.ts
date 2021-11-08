@@ -2,6 +2,7 @@ import { CartItem } from "./CartItem";
 import { Product } from "./Product";
 
 export interface Cart {
+  id?: number;
   items: CartItem[];
   getTotal(): number;
   addItem(item: CartItem): void;
