@@ -5,7 +5,9 @@ import { createUser, User } from "../entity/user";
 const prisma = new PrismaClient();
 
 function userFromPrisma(user: UserPrisma): User {
-  return createUser(user.username, user.email, user.password);
+  const parsedUser = createUser(user.username, user.email, user.password);
+  parsedUser.id = user.id;
+  return parsedUser;
 }
 
 const userGateway: UserGateway = {

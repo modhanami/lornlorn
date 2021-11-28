@@ -10,12 +10,8 @@ export interface UserGateway {
 }
 
 export interface CartGateway {
-  save(cart: Cart): Promise<void>;
-  findById(id: number): Promise<Cart | null>;
-}
-
-export interface UserCartGateway {
   save(userId: number, cart: Cart): Promise<void>;
+  findById(id: number): Promise<Cart | null>;
   findByUserId(userId: number): Promise<Cart | null>;
-  addToCart(userId: number, cartItem: CartItem): Promise<void>;
+  addToCart(cart: Cart, cartItem: CartItem): Promise<void>;
 }
