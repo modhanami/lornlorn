@@ -109,7 +109,7 @@ export interface TokenUseCase {
   verify(token: UserToken): Promise<any>;
 }
 
-export interface AuthenticationhUseCase {
+export interface AuthenticationUseCase {
   authenticate(username: UserUsername, password: UserPassword): Promise<UserToken>;
 }
 
