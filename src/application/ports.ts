@@ -2,7 +2,7 @@
 import { Cart } from "../domain/cart";
 import { CartItemQuantity } from "../domain/cartItem";
 import { Product, ProductPrice, ProductTitle } from "../domain/product";
-import { UniqueId, UserEmail, UserUsername } from "../domain/sharedKernel";
+import { UniqueId, UserToken, UserEmail, UserUsername } from "../domain/sharedKernel";
 import { User, UserPassword } from "../domain/user";
 
 // Driven ports
@@ -95,4 +95,27 @@ export type FindProductByIdQuery = {
 export interface ProductUseCase {
   create(command: CreateProductCommand): Promise<Product>;
   findById(query: FindProductByIdQuery): Promise<Product>;
+}
+
+
+
+export type AuthenticationCredentials = {
+  username: UserUsername;
+  password: UserPassword;
+}
+
+export interface TokenUseCase {
+  sign(payload: any): Promise<UserToken>;
+  verify(token: UserToken): Promise<any>;
+}
+
+export interface AuthenticationhUseCase {
+  authenticate(username: UserUsername, password: UserPassword): Promise<UserToken>;
+}
+
+
+
+export interface PasswordUseCase {
+  hash(password: UserPassword): Promise<UserPassword>;
+  compare(candidate: UserPassword, hashedPassword: UserPassword): Promise<boolean>;
 }
