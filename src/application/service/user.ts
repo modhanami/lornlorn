@@ -1,7 +1,7 @@
 import { PasswordUseCase, UserGateway, UserUseCase } from "../ports";
 
 // TODO: Validation for commands and queries
-export function createUserService(userGateway: UserGateway, passwordService: PasswordUseCase): UserUseCase {
+export function createUserService(userGateway: UserGateway): UserUseCase {
   return {
     async create(command) {
       const existingUser = await userGateway.findByUsername(command.username);
@@ -9,11 +9,10 @@ export function createUserService(userGateway: UserGateway, passwordService: Pas
         return null;
       }
 
-      const hashedPassword = await passwordService.hash(command.password);
       const user = await userGateway.save({
-        email: command.email || null,
+        email: command.email,
         username: command.username,
-        password: hashedPassword,
+        password: command.password,
       });
 
       return user;
