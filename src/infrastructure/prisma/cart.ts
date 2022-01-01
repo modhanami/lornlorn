@@ -15,7 +15,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
         const existingCart = await prisma.cart.update({
           where: { id: cart.id },
           data: {
-            cartItem: {
+            cartItems: {
               update: updateCartItems.map((item) => ({
                 where: { id: item.id },
                 data: {
@@ -30,7 +30,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
           },
           include: {
             user: true,
-            cartItem: {
+            cartItems: {
               include: {
                 product: true,
               },
@@ -38,15 +38,19 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
           },
         });
 
+        if (!existingCart) {
+          return null;
+        }
+
         return {
           id: existingCart.id,
           owner: existingCart.user,
-          items: existingCart.cartItem.map((item) => ({
+          items: existingCart.cartItems.map((item) => ({
             id: item.id,
             product: {
-              id: item.productId,
+              id: item.product.id,
               name: item.product.name,
-              price: item.product.price,
+              price: Number(item.product.price),
             },
             quantity: item.quantity,
           })),
@@ -56,7 +60,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
         const newCart = await prisma.cart.create({
           data: {
             user: { connect: { id: cart.owner.id } },
-            cartItem: {
+            cartItems: {
               create: cart.items.map(item => ({
                 product: { connect: { id: item.product.id } },
                 quantity: item.quantity
@@ -64,6 +68,10 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
             }
           }
         });
+
+        if (!newCart) {
+          return null;
+        }
 
         return {
           id: newCart.id,
@@ -77,7 +85,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
       const cart = await prisma.cart.findFirst({
         where: { id },
         include: {
-          cartItem: {
+          cartItems: {
             include: {
               product: true
             }
@@ -85,10 +93,15 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
           user: true
         }
       });
+
+      if (!cart) {
+        return null;
+      }
+
       return {
         id: cart.id,
         owner: cart.user,
-        items: cart.cartItem.map(item => ({
+        items: cart.cartItems.map(item => ({
           id: item.id,
           product: {
             id: item.product.id,
@@ -104,7 +117,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
       const cart = await prisma.cart.findFirst({
         where: { user: { id: ownerId } },
         include: {
-          cartItem: {
+          cartItems: {
             include: {
               product: true
             }
@@ -112,10 +125,15 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
           user: true
         }
       });
+
+      if (!cart) {
+        return null;
+      }
+
       return {
         id: cart.id,
         owner: cart.user,
-        items: cart.cartItem.map(item => ({
+        items: cart.cartItems.map(item => ({
           id: item.id,
           product: {
             id: item.product.id,
