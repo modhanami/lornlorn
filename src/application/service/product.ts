@@ -16,5 +16,10 @@ export function createProductService(productGateway: ProductGateway): ProductUse
       const product = productGateway.findById(query.productId);
       return product || null;
     },
+
+    async findAll() {
+      const products = await productGateway.findAll();
+      return products || [];
+    }
   };
 }

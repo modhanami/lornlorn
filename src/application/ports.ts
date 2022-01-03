@@ -23,6 +23,7 @@ export interface CartGateway {
 export interface ProductGateway {
   save(product: Product): Promise<Product>;
   findById(id: UniqueId): Promise<Product>;
+  findAll(): Promise<Product[]>;
 }
 
 
@@ -95,6 +96,7 @@ export type FindProductByIdQuery = {
 export interface ProductUseCase {
   create(command: CreateProductCommand): Promise<Product>;
   findById(query: FindProductByIdQuery): Promise<Product>;
+  findAll(): Promise<Product[]>;
 }
 
 
