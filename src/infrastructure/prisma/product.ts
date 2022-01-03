@@ -32,6 +32,15 @@ export function createProductAdapter(prisma: PrismaClient): ProductGateway {
         name: existingProduct.name,
         price: Number(existingProduct.price.toString()),
       }
+    },
+
+    async findAll(): Promise<Product[]> {
+      const existingProducts = await prisma.product.findMany();
+      return existingProducts.map((existingProduct) => ({
+        id: existingProduct.id,
+        name: existingProduct.name,
+        price: Number(existingProduct.price.toString()),
+      }));
     }
   };
 }
