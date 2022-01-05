@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { AuthenticationUseCase, CreateUserCommand, FindUserByEmailQuery, FindUserByUsernameQuery, PasswordUseCase, UserUseCase } from "../../../application/ports";
-import { User } from "../../../domain/user";
+import { mapUserResponse } from "../mapper";
 import sharedMessages from "../shared/sharedMessages";
 
 const messages = {
@@ -11,13 +11,7 @@ const messages = {
   INVALID_CREDENTIALS: "Either username or password is invalid",
 }
 
-function mapUserResponse(user: User): Partial<User> {
-  return {
-    id: user.id,
-    email: user.email,
-    username: user.username,
-  };
-}
+
 
 interface UserController {
   signup: RequestHandler;

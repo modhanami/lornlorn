@@ -1,18 +1,12 @@
 import { RequestHandler } from "express";
 import { AddCartItemCommand, CartUseCase } from "../../../application/ports";
 import { Cart } from "../../../domain/cart";
+import { mapCartResponse } from "../mapper";
 import sharedMessages from "../shared/sharedMessages";
 
 const messages = {
   CART_NOT_FOUND: 'Cart not found',
 };
-
-function mapCartResponse(cart: Cart): Partial<Cart> {
-  return {
-    owner: cart.owner,
-    items: cart.items,
-  };
-}
 
 interface CartController {
   addOwnCartItem: RequestHandler;

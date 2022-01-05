@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { CreateProductCommand, ProductUseCase } from "../../../application/ports";
 import { Product } from "../../../domain/product";
+import { mapProductResponse } from "../mapper";
 import sharedMessages from "../shared/sharedMessages";
 
 const messages = {
@@ -10,13 +11,7 @@ const messages = {
   PRODUCT_NOT_FOUND: 'Product not found',
 };
 
-function mapProductResponse(product: Product): Partial<Product> {
-  return {
-    id: product.id,
-    name: product.name,
-    price: product.price,
-  };
-}
+
 
 interface ProductController {
   create: RequestHandler;
