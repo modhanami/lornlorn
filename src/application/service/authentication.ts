@@ -1,4 +1,10 @@
+import { UniqueId, UserUsername } from "../../domain/sharedKernel";
 import { AuthenticationUseCase, PasswordUseCase, TokenUseCase, UserGateway } from "../ports";
+
+export type UserTokenPayload = {
+  id: UniqueId;
+  username: UserUsername;
+};
 
 export function createAuthenticationService(userGateway: UserGateway, passwordService: PasswordUseCase, tokenService: TokenUseCase): AuthenticationUseCase {
   return {
@@ -13,8 +19,8 @@ export function createAuthenticationService(userGateway: UserGateway, passwordSe
         return null;
       }
 
-      const payload = {
-        userId: user.id,
+      const payload: UserTokenPayload = {
+        id: user.id,
         username: user.username,
       }
 
