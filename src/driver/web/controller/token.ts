@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { TokenUseCase, UserUseCase } from "../../../application/ports";
-import { UserTokenPayload } from "../../../application/service/authentication";
 import sharedMessages from "../shared/sharedMessages";
+import { createExpressRefreshTokenCookieArgs, createUserTokenPayload } from "./sharedUtils";
 
 interface TokenController {
   refresh: RequestHandler;
@@ -29,20 +29,12 @@ export function createTokenController(tokenService: TokenUseCase, userService: U
         }
 
         const user = await userService.findById({ userId });
-        const payload: UserTokenPayload = {
-          id: user.id,
-          username: user.username,
-        }
+        const payload = createUserTokenPayload(user);
 
         const newAccessToken = await tokenService.sign(payload);
         const newRefreshToken = await tokenService.generateRefreshTokenForUser(userId);
 
-        res.cookie('refreshToken', newRefreshToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: newRefreshToken.expiresAt,
-        });
+        res.cookie(...createExpressRefreshTokenCookieArgs(newRefreshToken));
 
         return res.status(200).send({
           accessToken: newAccessToken,

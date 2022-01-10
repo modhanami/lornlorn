@@ -1,4 +1,5 @@
 import { UniqueId, UserUsername } from "../../domain/sharedKernel";
+import { createUserTokenPayload } from "../../driver/web/controller/sharedUtils";
 import { AuthenticationUseCase, PasswordUseCase, TokenUseCase, UserGateway } from "../ports";
 
 export type UserTokenPayload = {
@@ -19,10 +20,7 @@ export function createAuthenticationService(userGateway: UserGateway, passwordSe
         return null;
       }
 
-      const payload: UserTokenPayload = {
-        id: user.id,
-        username: user.username,
-      }
+      const payload = createUserTokenPayload(user);
 
       const accessToken = await tokenService.sign(payload);
       const refreshToken = await tokenService.generateRefreshTokenForUser(user.id);

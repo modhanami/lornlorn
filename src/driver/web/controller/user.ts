@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { AuthenticationUseCase, CreateUserCommand, FindUserByEmailQuery, FindUserByUsernameQuery, PasswordUseCase, UserUseCase } from "../../../application/ports";
 import { mapUserResponse } from "../mapper";
 import sharedMessages from "../shared/sharedMessages";
+import { createExpressRefreshTokenCookieArgs } from "./sharedUtils";
 
 const messages = {
   USER_NOT_FOUND: "User not found",
@@ -74,12 +75,7 @@ export function createUserController(
       try {
         const { accessToken, refreshToken } = await authenticationService.authenticate(username, password);
 
-        res.cookie('refreshToken', refreshToken.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: 'strict',
-          expires: refreshToken.expiresAt,
-        });
+        res.cookie(...createExpressRefreshTokenCookieArgs(refreshToken));
 
         return res.send({
           accessToken,
