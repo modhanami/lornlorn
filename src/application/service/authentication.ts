@@ -24,8 +24,13 @@ export function createAuthenticationService(userGateway: UserGateway, passwordSe
         username: user.username,
       }
 
-      const signedToken = tokenService.sign(payload);
-      return signedToken;
+      const accessToken = await tokenService.sign(payload);
+      const refreshToken = await tokenService.generateRefreshTokenForUser(user.id);
+
+      return {
+        accessToken,
+        refreshToken,
+      }
     },
   }
 }

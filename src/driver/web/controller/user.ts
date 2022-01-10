@@ -72,15 +72,17 @@ export function createUserController(
       }
 
       try {
-        const token = await authenticationService.authenticate(username, password);
-        if (!token) {
-          return res.status(401).send({
-            message: messages.INVALID_CREDENTIALS,
-          });
-        }
+        const { accessToken, refreshToken } = await authenticationService.authenticate(username, password);
+
+        res.cookie('refreshToken', refreshToken.token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          expires: refreshToken.expiresAt,
+        });
 
         return res.send({
-          token,
+          accessToken,
         });
 
       } catch (err) {

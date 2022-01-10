@@ -129,7 +129,10 @@ export interface TokenUseCase {
 }
 
 export interface AuthenticationUseCase {
-  authenticate(username: UserUsername, password: UserPassword): Promise<UserToken>;
+  authenticate(username: UserUsername, password: UserPassword): Promise<{
+    accessToken: UserToken;
+    refreshToken: RefreshToken;
+  }>;
 }
 
 
