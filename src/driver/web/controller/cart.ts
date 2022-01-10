@@ -12,6 +12,7 @@ interface CartController {
   addOwnCartItem: RequestHandler;
   findById: RequestHandler;
   findByOwnerId: RequestHandler;
+  findOwnCart: RequestHandler;
 }
 
 export function createCartController(cartService: CartUseCase): CartController {
@@ -130,5 +131,22 @@ export function createCartController(cartService: CartUseCase): CartController {
         return next(err);
       }
     },
+
+    async findOwnCart(req, res, next) {
+      const { id: ownerId } = req.user;
+      try {
+        const cart = await cartService.findByOwnerId({ ownerId });
+        if (!cart) {
+          return res.status(404).send({
+            message: messages.CART_NOT_FOUND,
+          });
+        }
+
+        return res.status(200).send(mapCartResponse(cart));
+
+      } catch (err) {
+        return next(err);
+      }
+    }
   }
 }

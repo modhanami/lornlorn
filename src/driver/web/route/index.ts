@@ -56,6 +56,7 @@ productRouter.get("/:id", productController.findById);
 
 router.use("/carts", cartRouter);
 cartRouter.post("/me/add-item", authMiddlewares.verifyToken, cartController.addOwnCartItem);
+cartRouter.get("/me", authMiddlewares.verifyToken, cartController.findOwnCart);
 
 router.use(errorHandler);
 
