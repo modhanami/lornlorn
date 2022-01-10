@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  cart      Cart?
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  password     String
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  cart         Cart?
+  refreshToken RefreshToken?
 }
 
 model Cart {
@@ -45,6 +46,16 @@ model CartItem {
   cartId    Int
   cart      Cart     @relation(fields: [cartId], references: [id])
   quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
