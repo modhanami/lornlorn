@@ -2,7 +2,8 @@
 import { Cart } from "../domain/cart";
 import { CartItemQuantity } from "../domain/cartItem";
 import { Product, ProductPrice, ProductTitle } from "../domain/product";
-import { UniqueId, UserToken, UserEmail, UserUsername } from "../domain/sharedKernel";
+import { RefreshToken } from "../domain/refreshToken";
+import { UniqueId, UserEmail, UserToken, UserUsername } from "../domain/sharedKernel";
 import { User, UserPassword } from "../domain/user";
 
 // Driven ports
@@ -24,6 +25,11 @@ export interface ProductGateway {
   save(product: Product): Promise<Product>;
   findById(id: UniqueId): Promise<Product>;
   findAll(): Promise<Product[]>;
+}
+
+export interface RefreshTokenGateway {
+  save(token: RefreshToken): Promise<RefreshToken>;
+  findByToken(token: UserToken): Promise<RefreshToken>;
 }
 
 
@@ -106,9 +112,20 @@ export type AuthenticationCredentials = {
   password: UserPassword;
 }
 
+export type ValidateRefreshTokenCommand = {
+  token: UserToken;
+};
+
+type ValidateRefreshTokenResult = {
+  isValid: boolean;
+  userId: UniqueId;
+};
+
 export interface TokenUseCase {
   sign(payload: any): Promise<UserToken>;
   verify(token: UserToken): Promise<any>;
+  generateRefreshTokenForUser(userId: UniqueId): Promise<RefreshToken>;
+  validateRefreshToken(command: ValidateRefreshTokenCommand): Promise<ValidateRefreshTokenResult>;
 }
 
 export interface AuthenticationUseCase {
