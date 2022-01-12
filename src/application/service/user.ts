@@ -1,4 +1,4 @@
-import { PasswordUseCase, UserGateway, UserUseCase } from "../ports";
+import { UserGateway, UserUseCase } from "../ports";
 
 // TODO: Validation for commands and queries
 export function createUserService(userGateway: UserGateway): UserUseCase {
@@ -6,7 +6,7 @@ export function createUserService(userGateway: UserGateway): UserUseCase {
     async create(command) {
       const existingUser = await userGateway.findByUsername(command.username);
       if (existingUser) {
-        return null;
+        throw new Error("User already exists");
       }
 
       const user = await userGateway.save({
@@ -20,17 +20,17 @@ export function createUserService(userGateway: UserGateway): UserUseCase {
 
     async findByEmail(query) {
       const user = userGateway.findByEmail(query.email);
-      return user || null;
+      return user;
     },
 
     async findByUsername(query) {
       const user = userGateway.findByUsername(query.username);
-      return user || null;
+      return user;
     },
 
     async findById(query) {
       const user = userGateway.findById(query.userId);
-      return user || null;
+      return user;
     },
   }
 }
