@@ -18,20 +18,20 @@ interface CartController {
 export function createCartController(cartService: CartUseCase): CartController {
 
   async function addCartItemForUser(ownerId: number, productId: number, quantity: number): Promise<Cart> {
+    let cart: Cart = null;
     const existingCart = await cartService.findByOwnerId({ ownerId });
-    let cart = existingCart;
-    if (!cart) {
+    if (!existingCart) {
       cart = await cartService.create({ ownerId });
     }
 
     const command: AddCartItemCommand = {
-      cartId: cart.id,
+      ownerId,
       productId: productId,
       quantity: quantity,
     };
 
-    const updatedCart = await cartService.addCartItem(command);
-    return updatedCart;
+    cart = await cartService.addCartItem(command);
+    return cart;
   }
 
   return {

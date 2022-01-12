@@ -68,7 +68,7 @@ export type CreateCartCommand = {
 };
 
 export type AddCartItemCommand = {
-  cartId: UniqueId;
+  ownerId: UniqueId;
   productId: UniqueId;
   quantity: CartItemQuantity;
 };
