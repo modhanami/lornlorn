@@ -1,7 +1,7 @@
-import { Cart } from "../../domain/cart";
-import { Product } from "../../domain/product";
-import { User } from "../../domain/user";
-import { createCartService } from "./cart";
+import { Cart } from "../../../domain/cart";
+import { Product } from "../../../domain/product";
+import { User } from "../../../domain/user";
+import { createCartService } from "../cart";
 
 describe('Cart service', () => {
   let cartGateway;

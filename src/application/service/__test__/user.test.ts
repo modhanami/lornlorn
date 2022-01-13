@@ -1,5 +1,5 @@
-import { User } from "../../domain/user";
-import { createUserService } from "./user";
+import { User } from "../../../domain/user";
+import { createUserService } from "../user";
 
 describe(`User service`, () => {
   let userGateway;

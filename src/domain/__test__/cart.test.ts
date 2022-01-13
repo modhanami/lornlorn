@@ -1,4 +1,4 @@
-import {addCartItem, Cart, getCartTotal} from "./cart"
+import {addCartItem, Cart, getCartTotal} from "../cart"
 
 function createCartWithTwoExistingItems() {
   const existingCart: Cart = {
