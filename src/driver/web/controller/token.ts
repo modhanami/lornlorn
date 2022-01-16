@@ -28,7 +28,7 @@ export function createTokenController(tokenService: TokenUseCase, userService: U
           });
         }
 
-        const user = await userService.findById({ userId });
+        const user = await userService.findById(userId);
         const payload = createUserTokenPayload(user);
 
         const newAccessToken = await tokenService.sign(payload);
