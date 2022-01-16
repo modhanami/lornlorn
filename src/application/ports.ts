@@ -49,23 +49,11 @@ export type CreateUserCommand = {
   password: UserPassword;
 };
 
-export type FindUserByEmailQuery = {
-  email: UserEmail;
-};
-
-export type FindUserByUsernameQuery = {
-  username: UserUsername;
-};
-
-export type FindUserByIdQuery = {
-  userId: UniqueId;
-};
-
 export interface UserUseCase {
   create(command: CreateUserCommand): Promise<User>;
-  findByEmail(query: FindUserByEmailQuery): Promise<User>;
-  findByUsername(query: FindUserByUsernameQuery): Promise<User>;
-  findById(query: FindUserByIdQuery): Promise<User>;
+  findByEmail(email: UserEmail): Promise<User>;
+  findByUsername(username: UserUsername): Promise<User>;
+  findById(id: UniqueId): Promise<User>;
 }
 
 

@@ -18,18 +18,18 @@ export function createUserService(userGateway: UserGateway): UserUseCase {
       return user;
     },
 
-    async findByEmail(query) {
-      const user = userGateway.findByEmail(query.email);
+    async findByEmail(email) {
+      const user = userGateway.findByEmail(email);
       return user;
     },
 
-    async findByUsername(query) {
-      const user = userGateway.findByUsername(query.username);
+    async findByUsername(username) {
+      const user = userGateway.findByUsername(username);
       return user;
     },
 
-    async findById(query) {
-      const user = userGateway.findById(query.userId);
+    async findById(id) {
+      const user = userGateway.findById(id);
       return user;
     },
   }

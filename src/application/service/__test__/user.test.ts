@@ -1,20 +1,11 @@
-import { User } from "../../../domain/user";
+import { UserGateway, UserUseCase } from "../../ports";
 import { createUserService } from "../user";
+import { user1, user1Persisted } from "./shared";
+import { Mocked } from "./shared/types";
 
 describe(`User service`, () => {
-  let userGateway;
-  let userService;
-
-  const user1: User = {
-    email: 'abc@def.com',
-    username: 'abc',
-    password: '123',
-  };
-
-  const user1Persisted: User = {
-    ...user1,
-    id: 1,
-  };
+  let userGateway: Mocked<UserGateway>;
+  let userService: UserUseCase;
 
   beforeEach(() => {
     userGateway = {

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { AuthenticationUseCase, CreateUserCommand, FindUserByEmailQuery, FindUserByUsernameQuery, PasswordUseCase, UserUseCase } from "../../../application/ports";
+import { AuthenticationUseCase, CreateUserCommand, PasswordUseCase, UserUseCase } from "../../../application/ports";
 import { mapUserResponse } from "../mapper";
 import sharedMessages from "../shared/sharedMessages";
 import { createExpressRefreshTokenCookieArgs } from "./sharedUtils";
@@ -36,7 +36,7 @@ export function createUserController(
       }
 
       try {
-        const existingUser = await userService.findByUsername({ username });
+        const existingUser = await userService.findByUsername(username);
         if (existingUser) {
           return res.status(409).send({
             message: messages.USER_ALREADY_EXISTS,
@@ -95,11 +95,7 @@ export function createUserController(
       }
 
       try {
-        const query: FindUserByEmailQuery = {
-          email,
-        };
-
-        const user = await userService.findByEmail(query);
+        const user = await userService.findByEmail(email);
         if (req.user.id !== user.id) {
           return res.status(403).send({
             message: sharedMessages.FORBIDDEN,
@@ -127,11 +123,7 @@ export function createUserController(
       }
 
       try {
-        const query: FindUserByUsernameQuery = {
-          username: req.params.username,
-        };
-
-        const user = await userService.findByUsername(query);
+        const user = await userService.findByUsername(username);
         if (req.user.id !== user.id) {
           return res.status(403).send({
             message: sharedMessages.FORBIDDEN,
