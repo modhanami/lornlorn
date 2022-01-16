@@ -19,6 +19,7 @@ model User {
   updatedAt    DateTime      @default(now()) @updatedAt
   cart         Cart?
   refreshToken RefreshToken?
+  Order        Order[]
 }
 
 model Cart {
@@ -37,6 +38,7 @@ model Product {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @default(now()) @updatedAt
   cartItems CartItem[]
+  OrderItem OrderItem[]
 }
 
 model CartItem {
@@ -58,4 +60,37 @@ model RefreshToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  // uuid          String      @unique
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  orderItems    OrderItem[]
+  status        OrderStatus @relation(fields: [orderStatusId], references: [id])
+  orderStatusId Int
+  total         Decimal
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  quantity  Int
+  subtotal  Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model OrderStatus {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  Order     Order[]
 }
