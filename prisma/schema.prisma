@@ -11,40 +11,86 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  username    String   @unique
-  password    String
-  email       String   @unique
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cart        Cart?
+  id           Int           @id @default(autoincrement())
+  username     String        @unique
+  password     String
+  email        String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @default(now()) @updatedAt
+  cart         Cart?
+  refreshToken RefreshToken?
+  Order        Order[]
 }
 
 model Cart {
-  id          Int      @id @default(autoincrement())
-  user        User    @relation(fields: [userId], references: [id])
-  userId      Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cartItem    CartItem[]
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+  cartItems CartItem[]
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  price       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  cartItem    CartItem?
+  id        Int        @id @default(autoincrement())
+  name      String
+  price     Decimal
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now()) @updatedAt
+  cartItems CartItem[]
+  OrderItem OrderItem[]
 }
 
 model CartItem {
-  id          Int      @id @default(autoincrement())
-  product     Product @relation(fields: [productId], references: [id])
-  productId   Int
-  cart        Cart    @relation(fields: [cartId], references: [id])
-  cartId      Int
-  quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  // uuid          String      @unique
+  userId        Int
+  user          User        @relation(fields: [userId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now()) @updatedAt
+  orderItems    OrderItem[]
+  status        OrderStatus @relation(fields: [orderStatusId], references: [id])
+  orderStatusId Int
+  total         Decimal
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  quantity  Int
+  subtotal  Decimal
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model OrderStatus {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  Order     Order[]
 }
