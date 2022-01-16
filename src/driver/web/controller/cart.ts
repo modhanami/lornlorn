@@ -19,9 +19,9 @@ export function createCartController(cartService: CartUseCase): CartController {
 
   async function addCartItemForUser(ownerId: number, productId: number, quantity: number): Promise<Cart> {
     let cart: Cart = null;
-    const existingCart = await cartService.findByOwnerId({ ownerId });
+    const existingCart = await cartService.findByOwnerId(ownerId);
     if (!existingCart) {
-      cart = await cartService.create({ ownerId });
+      cart = await cartService.create(ownerId);
     }
 
     const command: AddCartItemCommand = {
@@ -78,7 +78,7 @@ export function createCartController(cartService: CartUseCase): CartController {
           });
         }
 
-        const cart = await cartService.findById({ cartId: parsedId });
+        const cart = await cartService.findById(parsedId);
         if (req.user.id !== cart.owner.id) {
           return res.status(403).send({
             message: sharedMessages.FORBIDDEN,
@@ -113,7 +113,7 @@ export function createCartController(cartService: CartUseCase): CartController {
           });
         }
 
-        const cart = await cartService.findByOwnerId({ ownerId: parsedOwnerId });
+        const cart = await cartService.findByOwnerId(parsedOwnerId);
         if (req.user.id !== cart.owner.id) {
           return res.status(403).send({
             message: sharedMessages.FORBIDDEN,
@@ -135,7 +135,7 @@ export function createCartController(cartService: CartUseCase): CartController {
     async findOwnCart(req, res, next) {
       const { id: ownerId } = req.user;
       try {
-        const cart = await cartService.findByOwnerId({ ownerId });
+        const cart = await cartService.findByOwnerId(ownerId);
         if (!cart) {
           return res.status(404).send({
             message: messages.CART_NOT_FOUND,

@@ -58,29 +58,17 @@ export interface UserUseCase {
 
 
 
-export type CreateCartCommand = {
-  ownerId: UniqueId;
-};
-
 export type AddCartItemCommand = {
   ownerId: UniqueId;
   productId: UniqueId;
   quantity: CartItemQuantity;
 };
 
-export type FindCartByIdQuery = {
-  cartId: UniqueId;
-};
-
-export type FindCartByOwnerIdQuery = {
-  ownerId: UniqueId;
-};
-
 export interface CartUseCase {
-  create(command: CreateCartCommand): Promise<Cart>;
+  create(ownerId: UniqueId): Promise<Cart>;
   addCartItem(command: AddCartItemCommand): Promise<Cart>;
-  findById(query: FindCartByIdQuery): Promise<Cart>;
-  findByOwnerId(query: FindCartByOwnerIdQuery): Promise<Cart>;
+  findById(id: UniqueId): Promise<Cart>;
+  findByOwnerId(ownerId: UniqueId): Promise<Cart>;
 }
 
 

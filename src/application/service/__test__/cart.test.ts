@@ -1,42 +1,13 @@
-import { Cart } from "../../../domain/cart";
-import { Product } from "../../../domain/product";
-import { User } from "../../../domain/user";
+import { CartGateway, CartUseCase, UserGateway, ProductGateway } from "../../ports";
 import { createCartService } from "../cart";
+import { cart1Persisted, cart1PersistedWithOneItem, product1Persisted, user1Persisted } from "./shared";
+import { Mocked } from "./shared/types";
 
 describe('Cart service', () => {
-  let cartGateway;
-  let cartService;
-  let userGateway;
-  let productGateway;
-
-  const user1Persisted: User = {
-    id: 1,
-    username: 'abc',
-    email: 'abc@def.com',
-    password: '123'
-  };
-
-  const product1Persisted: Product = {
-    id: 1,
-    name: 'Product 1',
-    price: 10
-  };
-
-  const cart1Persisted: Cart = {
-    id: 1,
-    owner: user1Persisted,
-    items: []
-  };
-
-  const cart1PersistedWithOneItem: Cart = {
-    ...cart1Persisted,
-    items: [
-      {
-        product: product1Persisted,
-        quantity: 1
-      }
-    ]
-  };
+  let cartGateway: Mocked<CartGateway>;
+  let cartService: CartUseCase;
+  let userGateway: Mocked<UserGateway>;
+  let productGateway: Mocked<ProductGateway>;
 
   beforeEach(() => {
     cartGateway = {
@@ -46,11 +17,15 @@ describe('Cart service', () => {
     };
 
     userGateway = {
+      save: jest.fn(),
+      findByEmail: jest.fn(),
       findById: jest.fn(),
       findByUsername: jest.fn(),
     };
 
     productGateway = {
+      save: jest.fn(),
+      findAll: jest.fn(),
       findById: jest.fn(),
     };
 
@@ -63,9 +38,7 @@ describe('Cart service', () => {
       cartGateway.findByOwnerId.mockResolvedValue(null);
       cartGateway.save.mockResolvedValue(cart1Persisted);
 
-      const createdCart = await cartService.create({
-        ownerId: user1Persisted.id
-      });
+      const createdCart = await cartService.create(user1Persisted.id);
 
       expect(createdCart).toEqual(cart1Persisted);
     });
@@ -74,9 +47,7 @@ describe('Cart service', () => {
       userGateway.findById.mockResolvedValue(user1Persisted);
       cartGateway.findByOwnerId.mockResolvedValueOnce(cart1Persisted);
 
-      await expect(cartService.create({
-        ownerId: user1Persisted.id
-      })).rejects.toThrow('Cart already exists for user');
+      await expect(cartService.create(user1Persisted.id)).rejects.toThrow('Cart already exists for user');
     });
   });
 
