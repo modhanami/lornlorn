@@ -5,13 +5,13 @@ import { CartGateway, CartUseCase, ProductGateway, UserGateway } from "../ports"
 // TODO: Validation for commands and queries
 export function createCartService(cartGateway: CartGateway, userGateway: UserGateway, productGateway: ProductGateway): CartUseCase {
   return {
-    async create(command) {
-      const user = await userGateway.findById(command.ownerId);
-      const existingCart = await cartGateway.findByOwnerId(command.ownerId);
+    async create(ownerId) {
+      const user = await userGateway.findById(ownerId);
+      const existingCart = await cartGateway.findByOwnerId(ownerId);
       if (existingCart) {
         throw new Error("Cart already exists for user");
       }
-      
+
       const persistedCart = await cartGateway.save({
         owner: user,
         items: [],
@@ -25,7 +25,7 @@ export function createCartService(cartGateway: CartGateway, userGateway: UserGat
       if (!cart) {
         throw new Error("Cart does not exist for user");
       }
-      
+
       const product = await productGateway.findById(command.productId);
       if (!product) {
         throw new Error("Product does not exist");
@@ -35,20 +35,21 @@ export function createCartService(cartGateway: CartGateway, userGateway: UserGat
         product,
         quantity: command.quantity,
       };
-
+      
       const updatedCart = _addCartItem(cart, cartItem);
       const persistedCart = await cartGateway.save(updatedCart);
+      console.log(persistedCart);
 
       return persistedCart;
     },
 
-    async findById(query) {
-      const cart = cartGateway.findById(query.cartId);
+    async findById(id) {
+      const cart = cartGateway.findById(id);
       return cart;
     },
 
-    async findByOwnerId(query) {
-      const cart = cartGateway.findByOwnerId(query.ownerId);
+    async findByOwnerId(ownerId) {
+      const cart = cartGateway.findByOwnerId(ownerId);
       return cart;
     },
   };
