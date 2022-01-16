@@ -56,7 +56,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
       const newCartItems = cart.items;
       const newCartItemsIds = newCartItems.map((item) => item.id);
 
-      const cartItemsToUpdate = newCartItems.filter((item) => existingCartItemIds.includes(item.product.id));
+      const cartItemsToUpdate = newCartItems.filter((item) => existingCartItemIds.includes(item.id));
       const cartItemsToCreate = newCartItems.filter((item) => !existingCartItemIds.includes(item.id));
       const cartItemsToDelete = existingCartItems.filter((item) => !newCartItemsIds.includes(item.id));
 
