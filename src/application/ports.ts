@@ -1,6 +1,7 @@
 
 import { Cart } from "../domain/cart";
 import { CartItemQuantity } from "../domain/cartItem";
+import { Order } from "../domain/order";
 import { Product, ProductPrice, ProductTitle } from "../domain/product";
 import { RefreshToken } from "../domain/refreshToken";
 import { UniqueId, UserEmail, UserToken, UserUsername } from "../domain/sharedKernel";
@@ -30,6 +31,12 @@ export interface ProductGateway {
 export interface RefreshTokenGateway {
   save(token: RefreshToken): Promise<RefreshToken>;
   findByToken(token: UserToken): Promise<RefreshToken>;
+}
+
+export interface OrderGateway {
+  save(order: Order): Promise<Order>;
+  findById(id: UniqueId): Promise<Order>;
+  findByOwnerId(ownerId: UniqueId): Promise<Order[]>;
 }
 
 
@@ -140,4 +147,12 @@ export interface AuthenticationUseCase {
 export interface PasswordUseCase {
   hash(password: UserPassword): Promise<UserPassword>;
   compare(candidate: UserPassword, hashedPassword: UserPassword): Promise<boolean>;
+}
+
+
+
+export interface OrderUseCase {
+  create(cart: Cart): Promise<Order>;
+  findById(orderId: UniqueId): Promise<Order>;
+  findByOwnerId(ownerId: UniqueId): Promise<Order[]>;
 }
