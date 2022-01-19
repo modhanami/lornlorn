@@ -34,7 +34,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
           }
         });
 
-        return mapPrismaCartFullyIncludedToDomain(newCart);
+        return newCart && mapPrismaCartFullyIncludedToDomain(newCart);
       }
 
       const existingCart = await prisma.cart.findFirst({
@@ -93,7 +93,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
         },
       });
 
-      return mapPrismaCartFullyIncludedToDomain(updatedCart);
+      return updatedCart && mapPrismaCartFullyIncludedToDomain(updatedCart);
     },
 
     async findById(id: UniqueId): Promise<Cart> {
@@ -109,7 +109,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
         }
       });
 
-      return mapPrismaCartFullyIncludedToDomain(cart);
+      return cart && mapPrismaCartFullyIncludedToDomain(cart);
     },
 
     async findByOwnerId(ownerId: UniqueId): Promise<Cart> {
@@ -125,7 +125,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
         }
       });
 
-      return mapPrismaCartFullyIncludedToDomain(cart);
+      return cart && mapPrismaCartFullyIncludedToDomain(cart);
     }
   }
 }
