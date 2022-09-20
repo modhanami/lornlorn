@@ -3,3 +3,8 @@ dist
 .env
 *.db
 *.log
+.idea
+.vscode
+*.dmm.ts
+.scannerwork
+backup

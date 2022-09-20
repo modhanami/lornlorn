@@ -1,5 +1,5 @@
 import { Order } from "../../domain/order";
-import { CartGateway, OrderGateway, OrderUseCase } from "../ports";
+import { OrderGateway, OrderUseCase } from "../ports";
 
 export function createOrderService(orderGateway: OrderGateway): OrderUseCase {
   return {

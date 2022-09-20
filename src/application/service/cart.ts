@@ -52,5 +52,16 @@ export function createCartService(cartGateway: CartGateway, userGateway: UserGat
       const cart = cartGateway.findByOwnerId(ownerId);
       return cart;
     },
+
+    async clearCart(ownerId) {
+      const cart = await cartGateway.findByOwnerId(ownerId);
+      if (!cart) {
+        throw new Error("Cart does not exist for user");
+      }
+
+      cart.items = [];
+      const persistedCart = await cartGateway.save(cart);
+      return persistedCart;
+    }
   };
 };

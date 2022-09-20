@@ -67,6 +67,7 @@ export type AddCartItemCommand = {
 export interface CartUseCase {
   create(ownerId: UniqueId): Promise<Cart>;
   addCartItem(command: AddCartItemCommand): Promise<Cart>;
+  clearCart(ownerId: UniqueId): Promise<Cart>;
   findById(id: UniqueId): Promise<Cart>;
   findByOwnerId(ownerId: UniqueId): Promise<Cart>;
 }

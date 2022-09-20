@@ -128,6 +128,24 @@ describe('Cart service', () => {
   });
 
 
+  describe('clearCart', () => {
+    it('should clear a cart', async () => {
+      cartGateway.findByOwnerId.mockResolvedValue(cart1PersistedWithOneItem);
+      cartGateway.save.mockResolvedValue(cart1Persisted);
+
+      const updatedCart = await cartService.clearCart(user1Persisted.id);
+
+      expect(updatedCart.items.length).toEqual(0);
+    });
+
+    it('should throw an error if cart does not exist', async () => {
+      cartGateway.findByOwnerId.mockResolvedValue(null);
+
+      await expect(cartService.clearCart(user1Persisted.id)).rejects.toThrow('Cart does not exist for user');
+    });
+  });
+
+
   describe('findById', () => {
     it('should find a cart by id', async () => {
       cartGateway.findById.mockResolvedValue(cart1Persisted);
