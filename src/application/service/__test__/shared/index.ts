@@ -1,8 +1,9 @@
 import { Cart } from "../../../../domain/cart";
 import { Product } from "../../../../domain/product";
 import { User } from "../../../../domain/user";
+import { MaybeNew } from "../../../ports";
 
-export const user1: User = {
+export const user1: MaybeNew<User> = {
   email: 'abc@def.com',
   username: 'abc',
   password: '123',

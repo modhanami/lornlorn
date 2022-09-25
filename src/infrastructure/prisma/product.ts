@@ -1,11 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { ProductGateway } from "../../application/ports";
-import { Product } from "../../domain/product";
-import { UniqueId } from "../../domain/sharedKernel";
 
 export function createProductAdapter(prisma: PrismaClient): ProductGateway {
   return {
-    async save(product: Product): Promise<Product> {
+    async save(product) {
       const upsertProduct = await prisma.product.upsert({
         where: { id: product.id || -1 },
         update: {
@@ -25,8 +23,12 @@ export function createProductAdapter(prisma: PrismaClient): ProductGateway {
       }
     },
 
-    async findById(id: UniqueId): Promise<Product> {
+    async findById(id) {
       const existingProduct = await prisma.product.findFirst({ where: { id } });
+      if (!existingProduct) {
+        return null;
+      }
+
       return {
         id: existingProduct.id,
         name: existingProduct.name,
@@ -34,7 +36,7 @@ export function createProductAdapter(prisma: PrismaClient): ProductGateway {
       }
     },
 
-    async findAll(): Promise<Product[]> {
+    async findAll() {
       const existingProducts = await prisma.product.findMany();
       return existingProducts.map((existingProduct) => ({
         id: existingProduct.id,

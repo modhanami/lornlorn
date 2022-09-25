@@ -4,7 +4,7 @@ import { UniqueId } from "./sharedKernel";
 export type CartItemQuantity = number;
 
 export type CartItem = {
-  id?: UniqueId;
+  id: UniqueId;
   product: Product;
   quantity: CartItemQuantity;
 }

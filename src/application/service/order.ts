@@ -1,5 +1,5 @@
 import { Order } from "../../domain/order";
-import { OrderGateway, OrderUseCase } from "../ports";
+import { MaybeNew, OrderGateway, OrderUseCase } from "../ports";
 
 export function createOrderService(orderGateway: OrderGateway): OrderUseCase {
   return {
@@ -8,7 +8,7 @@ export function createOrderService(orderGateway: OrderGateway): OrderUseCase {
         throw new Error("Cart is empty");
       }
 
-      const order: Order = {
+      const order: MaybeNew<Order> = {
         user: cart.owner,
         items: cart.items,
         status: "pending",

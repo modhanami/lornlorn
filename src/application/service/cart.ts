@@ -1,5 +1,4 @@
 import { addCartItem as _addCartItem } from "../../domain/cart";
-import { CartItem } from "../../domain/cartItem";
 import { CartGateway, CartUseCase, ProductGateway, UserGateway } from "../ports";
 
 // TODO: Validation for commands and queries
@@ -7,6 +6,9 @@ export function createCartService(cartGateway: CartGateway, userGateway: UserGat
   return {
     async create(ownerId) {
       const user = await userGateway.findById(ownerId);
+      if (!user) {
+        throw new Error("User not found");
+      }
       const existingCart = await cartGateway.findByOwnerId(ownerId);
       if (existingCart) {
         throw new Error("Cart already exists for user");
@@ -31,14 +33,13 @@ export function createCartService(cartGateway: CartGateway, userGateway: UserGat
         throw new Error("Product does not exist");
       }
 
-      const cartItem: CartItem = {
+      const cartItem = {
         product,
         quantity: command.quantity,
       };
       
       const updatedCart = _addCartItem(cart, cartItem);
       const persistedCart = await cartGateway.save(updatedCart);
-      console.log(persistedCart);
 
       return persistedCart;
     },

@@ -1,7 +1,6 @@
 import { Order as PrismaOrder, OrderItem as PrismaOrderItem, OrderStatus as PrismaOrderStatus, PrismaClient, Product as PrismaProduct, User as PrismaUser } from '@prisma/client';
 import { OrderGateway } from "../../application/ports";
 import { getOrderItemSubtotal, Order, OrderStatus } from "../../domain/order";
-import { UniqueId } from "../../domain/sharedKernel";
 
 type PrismaOrderFullyIncluded = PrismaOrder & {
   user: PrismaUser;
@@ -13,14 +12,14 @@ type PrismaOrderFullyIncluded = PrismaOrder & {
 
 export function createOrderAdapter(prisma: PrismaClient): OrderGateway {
   return {
-    async save(order: Order): Promise<Order> {
+    async save(order) {
       const status = await prisma.orderStatus.findFirst({
         where: {
           name: order.status,
         },
       });
 
-      if (status === null) {
+      if (!status) {
         throw new Error(`Order status ${order.status} not found`);
       }
 
@@ -77,14 +76,18 @@ export function createOrderAdapter(prisma: PrismaClient): OrderGateway {
         }
       });
 
+      if (!existingOrder) {
+        throw new Error(`Order ${order.id} not found`);
+      }
+
       const existingOrderItems = existingOrder.orderItems;
       const existingOrderItemsIds = existingOrderItems.map((item) => item.id);
       const newOrderItemsIds = orderItemsSummarized.map((item) => item.id);
 
       // FIXME: plain old for loop MIGHT be faster
-      const orderItemsToUpdate = orderItemsSummarized.filter((item) => existingOrderItemsIds.includes(item.id))
-      const orderItemsToCreate = orderItemsSummarized.filter((item) => !existingOrderItemsIds.includes(item.id));
-      const orderItemsToDelete = existingOrderItems.filter((item) => !newOrderItemsIds.includes(item.id));
+      const orderItemsToUpdate = orderItemsSummarized.filter((item) => item.id && existingOrderItemsIds.includes(item.id))
+      const orderItemsToCreate = orderItemsSummarized.filter((item) => item.id && !existingOrderItemsIds.includes(item.id));
+      const orderItemsToDelete = existingOrderItems.filter((item) => item.id && !newOrderItemsIds.includes(item.id));
 
       const updatedOrder = await prisma.order.update({
         where: { id: order.id },
@@ -98,10 +101,10 @@ export function createOrderAdapter(prisma: PrismaClient): OrderGateway {
                   id: item.id,
                 },
                 data: {
-                  quantity: item.quantity === existingItem.quantity
+                  quantity: item.quantity === existingItem?.quantity
                     ? undefined
                     : item.quantity,
-                  subtotal: item.subtotal === existingItem.subtotal.toNumber()
+                  subtotal: item.subtotal === existingItem?.subtotal.toNumber()
                     ? undefined
                     : item.subtotal,
                 },
@@ -132,7 +135,7 @@ export function createOrderAdapter(prisma: PrismaClient): OrderGateway {
       return mapPrismaOrderFullyIncludedToDomain(updatedOrder);
     },
 
-    async findById(id: UniqueId): Promise<Order> {
+    async findById(id) {
       const order = await prisma.order.findFirst({
         where: {
           id,
@@ -148,10 +151,14 @@ export function createOrderAdapter(prisma: PrismaClient): OrderGateway {
         }
       });
 
+      if (!order) {
+        return null;
+      }
+
       return mapPrismaOrderFullyIncludedToDomain(order);
     },
 
-    async findByOwnerId(ownerId: UniqueId): Promise<Order[]> {
+    async findByOwnerId(ownerId) {
       const orders = await prisma.order.findMany({
         where: {
           user: {
@@ -169,9 +176,7 @@ export function createOrderAdapter(prisma: PrismaClient): OrderGateway {
         }
       });
 
-      return orders.length === 0
-        ? null
-        : orders.map((order) => mapPrismaOrderFullyIncludedToDomain(order));
+      return orders.map((order) => mapPrismaOrderFullyIncludedToDomain(order));
     },
 
   }

@@ -18,7 +18,7 @@ interface CartController {
 export function createCartController(cartService: CartUseCase): CartController {
 
   async function addCartItemForUser(ownerId: number, productId: number, quantity: number): Promise<Cart> {
-    let cart: Cart = null;
+    let cart: Cart;
     const existingCart = await cartService.findByOwnerId(ownerId);
     if (!existingCart) {
       cart = await cartService.create(ownerId);
@@ -36,6 +36,9 @@ export function createCartController(cartService: CartUseCase): CartController {
 
   return {
     async addOwnCartItem(req, res, next) {
+      if (!req.user) {
+        return res.status(401).json(sharedMessages.UNAUTHORIZED);
+      }
       const { productId, quantity } = req.body;
       const { id: ownerId } = req.user;
       if (!productId || !quantity) {
@@ -63,6 +66,9 @@ export function createCartController(cartService: CartUseCase): CartController {
     },
 
     async findById(req, res, next) {
+      if (!req.user) {
+        return res.status(401).json(sharedMessages.UNAUTHORIZED);
+      }
       const { id } = req.params;
       if (!id) {
         return res.status(400).send({
@@ -79,19 +85,18 @@ export function createCartController(cartService: CartUseCase): CartController {
         }
 
         const cart = await cartService.findById(parsedId);
+        if (!cart) {
+          return res.status(404).send({
+            message: messages.CART_NOT_FOUND
+          });
+        }
         if (req.user.id !== cart.owner.id) {
           return res.status(403).send({
             message: sharedMessages.FORBIDDEN,
           });
         }
-        if (!cart) {
-          return res.status(404).send({
-            message: messages.CART_NOT_FOUND,
-          });
-        }
 
         return res.status(200).send(mapCartResponse(cart));
-
       } catch (err) {
         return next(err);
       }
@@ -114,25 +119,27 @@ export function createCartController(cartService: CartUseCase): CartController {
         }
 
         const cart = await cartService.findByOwnerId(parsedOwnerId);
-        if (req.user.id !== cart.owner.id) {
+        if (!cart) {
+          return res.status(404).send({
+            message: messages.CART_NOT_FOUND
+          });
+        }
+        if (req.user?.id !== cart.owner.id) {
           return res.status(403).send({
             message: sharedMessages.FORBIDDEN,
           });
         }
-        if (!cart) {
-          return res.status(404).send({
-            message: messages.CART_NOT_FOUND,
-          });
-        }
 
         return res.status(200).send(mapCartResponse(cart));
-
       } catch (err) {
         return next(err);
       }
     },
 
     async findOwnCart(req, res, next) {
+      if (!req.user) {
+        return res.status(401).json(sharedMessages.UNAUTHORIZED);
+      }
       const { id: ownerId } = req.user;
       try {
         const cart = await cartService.findByOwnerId(ownerId);

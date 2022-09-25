@@ -1,4 +1,4 @@
-import {UserGateway, UserUseCase} from "../ports";
+import { UserGateway, UserUseCase } from "../ports";
 
 // TODO: Validation for commands and queries
 export function createUserService(userGateway: UserGateway): UserUseCase {

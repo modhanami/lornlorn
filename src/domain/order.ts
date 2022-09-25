@@ -1,28 +1,29 @@
+import { MaybeNew } from "../application/ports";
 import { Product } from "./product";
 import { UniqueId } from "./sharedKernel";
 import { User } from "./user";
 
 export type Order = {
-  id?: UniqueId;
+  id: UniqueId;
   user: User;
-  items: OrderItem[];
+  items: MaybeNew<OrderItem>[];
   status: OrderStatus;
 };
 
 export type OrderItem = {
-  id?: UniqueId;
+  id: UniqueId;
   product: Product;
   quantity: number;
 };
 
 export type OrderStatus = "pending" | "paid" | "shipped" | "delivered";
 
-export function getOrderTotal(order: Order): number {
+export function getOrderTotal(order: MaybeNew<Order>): number {
   return order.items.reduce((total, item) => {
     return total + getOrderItemSubtotal(item);
   }, 0);
 }
 
-export function getOrderItemSubtotal(item: OrderItem): number {
+export function getOrderItemSubtotal(item: MaybeNew<OrderItem>): number {
   return item.product.price * item.quantity;
 }

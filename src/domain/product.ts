@@ -1,7 +1,7 @@
 import { UniqueId } from "./sharedKernel";
 
 export type Product = {
-  id?: UniqueId;
+  id: UniqueId;
   name: ProductTitle;
   price: ProductPrice;
 }

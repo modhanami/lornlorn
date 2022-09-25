@@ -7,35 +7,37 @@ import { RefreshToken } from "../domain/refreshToken";
 import { UniqueId, UserEmail, UserToken, UserUsername } from "../domain/sharedKernel";
 import { User, UserPassword } from "../domain/user";
 
+export type MaybeNew<T> = Omit<T, "id"> & { id?: UniqueId };
+
 // Driven ports
 
 export interface UserGateway {
-  save(user: User): Promise<User>;
-  findByEmail(email: UserEmail): Promise<User>;
-  findByUsername(username: UserUsername): Promise<User>;
-  findById(id: UniqueId): Promise<User>;
+  save(user: MaybeNew<User>): Promise<User>;
+  findByEmail(email: UserEmail): Promise<User | null>;
+  findByUsername(username: UserUsername): Promise<User | null>;
+  findById(id: UniqueId): Promise<User | null>;
 }
 
 export interface CartGateway {
-  save(cart: Cart): Promise<Cart>;
-  findById(id: UniqueId): Promise<Cart>;
-  findByOwnerId(ownerId: UniqueId): Promise<Cart>;
+  save(cart: MaybeNew<Cart>): Promise<Cart>;
+  findById(id: UniqueId): Promise<Cart | null>;
+  findByOwnerId(ownerId: UniqueId): Promise<Cart | null>;
 }
 
 export interface ProductGateway {
-  save(product: Product): Promise<Product>;
-  findById(id: UniqueId): Promise<Product>;
+  save(product: MaybeNew<Product>): Promise<Product>;
+  findById(id: UniqueId): Promise<Product | null>;
   findAll(): Promise<Product[]>;
 }
 
 export interface RefreshTokenGateway {
-  save(token: RefreshToken): Promise<RefreshToken>;
-  findByToken(token: UserToken): Promise<RefreshToken>;
+  save(token: MaybeNew<RefreshToken>): Promise<RefreshToken>;
+  findByToken(token: UserToken): Promise<RefreshToken | null>;
 }
 
 export interface OrderGateway {
-  save(order: Order): Promise<Order>;
-  findById(id: UniqueId): Promise<Order>;
+  save(order: MaybeNew<Order>): Promise<Order>;
+  findById(id: UniqueId): Promise<Order | null>
   findByOwnerId(ownerId: UniqueId): Promise<Order[]>;
 }
 
@@ -44,16 +46,16 @@ export interface OrderGateway {
 // Driver ports
 
 export type CreateUserCommand = {
-  email?: UserEmail;
+  email: UserEmail;
   username: UserUsername;
   password: UserPassword;
 };
 
 export interface UserUseCase {
   create(command: CreateUserCommand): Promise<User>;
-  findByEmail(email: UserEmail): Promise<User>;
-  findByUsername(username: UserUsername): Promise<User>;
-  findById(id: UniqueId): Promise<User>;
+  findByEmail(email: UserEmail): Promise<User | null>
+  findByUsername(username: UserUsername): Promise<User | null>;
+  findById(id: UniqueId): Promise<User | null>;
 }
 
 
@@ -68,8 +70,8 @@ export interface CartUseCase {
   create(ownerId: UniqueId): Promise<Cart>;
   addCartItem(command: AddCartItemCommand): Promise<Cart>;
   clearCart(ownerId: UniqueId): Promise<Cart>;
-  findById(id: UniqueId): Promise<Cart>;
-  findByOwnerId(ownerId: UniqueId): Promise<Cart>;
+  findById(id: UniqueId): Promise<Cart | null>;
+  findByOwnerId(ownerId: UniqueId): Promise<Cart | null>;
 }
 
 
@@ -85,7 +87,7 @@ export type FindProductByIdQuery = {
 
 export interface ProductUseCase {
   create(command: CreateProductCommand): Promise<Product>;
-  findById(query: FindProductByIdQuery): Promise<Product>;
+  findById(query: FindProductByIdQuery): Promise<Product | null>;
   findAll(): Promise<Product[]>;
 }
 
@@ -100,10 +102,7 @@ export type ValidateRefreshTokenCommand = {
   token: UserToken;
 };
 
-type ValidateRefreshTokenResult = {
-  isValid: boolean;
-  userId: UniqueId;
-};
+type ValidateRefreshTokenResult = {isValid: true, userId: UniqueId} | {isValid: false, userId: null};
 
 export interface TokenUseCase {
   sign(payload: any): Promise<UserToken>;
@@ -135,6 +134,6 @@ export interface PasswordUseCase {
 
 export interface OrderUseCase {
   create(cart: Cart): Promise<Order>;
-  findById(orderId: UniqueId): Promise<Order>;
+  findById(orderId: UniqueId): Promise<Order | null>;
   findByOwnerId(ownerId: UniqueId): Promise<Order[]>;
 }

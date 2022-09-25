@@ -1,7 +1,6 @@
 import { Cart as PrismaCart, CartItem as PrismaCartItem, PrismaClient, Product as PrismaProduct, User as PrismaUser } from "@prisma/client";
 import { CartGateway } from "../../application/ports";
 import { Cart } from "../../domain/cart";
-import { UniqueId } from "../../domain/sharedKernel";
 
 type PrismaFullyIncluded = PrismaCart & {
   user: PrismaUser;
@@ -12,7 +11,7 @@ type PrismaFullyIncluded = PrismaCart & {
 
 export function createCartAdapter(prisma: PrismaClient): CartGateway {
   return {
-    async save(cart: Cart): Promise<Cart> {
+    async save(cart) {
       if (cart.id === undefined) {
         const newCart = await prisma.cart.create({
           data: {
@@ -49,6 +48,9 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
           },
         },
       });
+      if (!existingCart) {
+        throw new Error("Cart does not exist");
+      }
 
       // create cart, then add new cart items or update existing cart items
       const existingCartItems = existingCart.cartItems;
@@ -56,8 +58,8 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
       const newCartItems = cart.items;
       const newCartItemsIds = newCartItems.map((item) => item.id);
 
-      const cartItemsToUpdate = newCartItems.filter((item) => existingCartItemIds.includes(item.id));
-      const cartItemsToCreate = newCartItems.filter((item) => !existingCartItemIds.includes(item.id));
+      const cartItemsToUpdate = newCartItems.filter((item) => item.id && existingCartItemIds.includes(item.id));
+      const cartItemsToCreate = newCartItems.filter((item) => !item.id || !existingCartItemIds.includes(item.id));
       const cartItemsToDelete = existingCartItems.filter((item) => !newCartItemsIds.includes(item.id));
 
       const updatedCart = await prisma.cart.update({
@@ -70,7 +72,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
               return {
                 where: { id: item.id },
                 data: {
-                  quantity: item.quantity === existingItem.quantity
+                  quantity: item.quantity === existingItem?.quantity
                     ? undefined
                     : item.quantity,
                 }
@@ -96,7 +98,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
       return updatedCart && mapPrismaCartFullyIncludedToDomain(updatedCart);
     },
 
-    async findById(id: UniqueId): Promise<Cart> {
+    async findById(id) {
       const cart = await prisma.cart.findFirst({
         where: { id },
         include: {
@@ -112,7 +114,7 @@ export function createCartAdapter(prisma: PrismaClient): CartGateway {
       return cart && mapPrismaCartFullyIncludedToDomain(cart);
     },
 
-    async findByOwnerId(ownerId: UniqueId): Promise<Cart> {
+    async findByOwnerId(ownerId) {
       const cart = await prisma.cart.findFirst({
         where: { user: { id: ownerId } },
         include: {

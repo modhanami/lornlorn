@@ -13,7 +13,7 @@ function mapToDomain(prismaRefreshToken: PrismaRefreshToken): RefreshToken {
 
 export function createRefreshTokenAdapter(prisma: PrismaClient): RefreshTokenGateway {
   return {
-    async save(refreshToken: RefreshToken): Promise<RefreshToken> {
+    async save(refreshToken) {
       const { token, expiresAt, ownerId } = refreshToken;
       const result = await prisma.refreshToken.upsert({
         where: { userId: ownerId },
@@ -31,7 +31,7 @@ export function createRefreshTokenAdapter(prisma: PrismaClient): RefreshTokenGat
       return mapToDomain(result);
     },
 
-    async findByToken(token: string): Promise<RefreshToken> {
+    async findByToken(token) {
       const result = await prisma.refreshToken.findFirst({ where: { token } });
       return result && mapToDomain(result);
     }

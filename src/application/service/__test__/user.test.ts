@@ -26,12 +26,6 @@ describe(`User service`, () => {
 
       expect(createdUser).toEqual(user1Persisted);
     });
-
-    it('should throw an error if user already exists', async () => {
-      userGateway.findByUsername.mockResolvedValue(user1Persisted);
-
-      await expect(userService.create(user1)).rejects.toThrow('User already exists');
-    });
   });
 
 

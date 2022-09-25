@@ -1,15 +1,15 @@
-import {RequestHandler} from "express";
-import sharedMessages from "../shared/sharedMessages";
-import {AuthenticationUseCase, TokenUseCase, UserUseCase} from "../../../application/ports";
+import { RequestHandler } from "express";
+import { Response } from "express-serve-static-core";
+import { AuthenticationUseCase, TokenUseCase, UserUseCase } from "../../../application/ports";
 import {
   errorMessages,
   InvalidCredentialsError,
   UserAlreadyExistsError,
   UserNotFoundError
 } from "../../../application/service/exceptions";
-import {User} from "../../../domain/user";
-import {Response} from "express-serve-static-core";
-import {RefreshToken} from "../../../domain/refreshToken";
+import { RefreshToken } from "../../../domain/refreshToken";
+import { User } from "../../../domain/user";
+import sharedMessages from "../shared/sharedMessages";
 
 interface AuthController {
   register: RequestHandler;
@@ -106,6 +106,11 @@ export function createAuthController(authService: AuthenticationUseCase, tokenSe
         }
 
         const user = await userService.findById(userId);
+        if (!user) {
+          return res.status(401).send({
+            message: sharedMessages.UNAUTHORIZED,
+          });
+        }
         const newAccessToken = await tokenService.create(user);
 
         return res.status(200).send({

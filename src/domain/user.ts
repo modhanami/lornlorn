@@ -1,7 +1,7 @@
 import { UniqueId, UserEmail, UserToken, UserUsername } from "./sharedKernel";
 
 export type User = {
-  id?: UniqueId;
+  id: UniqueId;
   username: UserUsername;
   password: UserPassword;
   email: UserEmail;
