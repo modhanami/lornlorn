@@ -107,16 +107,21 @@ type ValidateRefreshTokenResult = {
 
 export interface TokenUseCase {
   sign(payload: any): Promise<UserToken>;
+  create(user: User): Promise<UserToken>;
   verify(token: UserToken): Promise<any>;
-  generateRefreshTokenForUser(userId: UniqueId): Promise<RefreshToken>;
+  renewRefreshToken(userId: UniqueId): Promise<RefreshToken>;
   validateRefreshToken(command: ValidateRefreshTokenCommand): Promise<ValidateRefreshTokenResult>;
 }
 
+type RegisterRequest = {
+    email: UserEmail;
+    username: UserUsername;
+    password: UserPassword;
+}
+
 export interface AuthenticationUseCase {
-  authenticate(username: UserUsername, password: UserPassword): Promise<{
-    accessToken: UserToken;
-    refreshToken: RefreshToken;
-  }>;
+  authenticate(username: UserUsername, password: UserPassword): Promise<User>;
+  register(request: RegisterRequest): Promise<User>;
 }
 
 

@@ -32,7 +32,7 @@ export function createTokenController(tokenService: TokenUseCase, userService: U
         const payload = createUserTokenPayload(user);
 
         const newAccessToken = await tokenService.sign(payload);
-        const newRefreshToken = await tokenService.generateRefreshTokenForUser(userId);
+        const newRefreshToken = await tokenService.renewRefreshToken(userId);
 
         res.cookie(...createExpressRefreshTokenCookieArgs(newRefreshToken));
 

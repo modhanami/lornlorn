@@ -1,14 +1,9 @@
-import { UserGateway, UserUseCase } from "../ports";
+import {UserGateway, UserUseCase} from "../ports";
 
 // TODO: Validation for commands and queries
 export function createUserService(userGateway: UserGateway): UserUseCase {
   return {
     async create(command) {
-      const existingUser = await userGateway.findByUsername(command.username);
-      if (existingUser) {
-        throw new Error("User already exists");
-      }
-
       const user = await userGateway.save({
         email: command.email,
         username: command.username,

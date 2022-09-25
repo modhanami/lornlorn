@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import jwt from 'jsonwebtoken';
-import { RefreshTokenGateway, TokenUseCase } from '../ports';
+import {RefreshTokenGateway, TokenUseCase} from '../ports';
 
 export function createTokenService(refreshTokenGateway: RefreshTokenGateway): TokenUseCase {
   return {
@@ -8,11 +8,18 @@ export function createTokenService(refreshTokenGateway: RefreshTokenGateway): To
       return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     },
 
+    async create(user) {
+      return await this.sign({
+        id: user.id,
+        username: user.username,
+      });
+    },
+
     async verify(token) {
       return jwt.verify(token, process.env.JWT_SECRET);
     },
 
-    async generateRefreshTokenForUser(ownerId) {
+    async renewRefreshToken(ownerId) {
       const expiresAt = new Date();
       const tokenLifetimeInDays = Number(process.env.REFRESH_TOKEN_LIFETIME_IN_DAYS);
       expiresAt.setDate(expiresAt.getDate() + tokenLifetimeInDays);
@@ -22,13 +29,11 @@ export function createTokenService(refreshTokenGateway: RefreshTokenGateway): To
       const bytesNeeded = Math.ceil(tokenLength / (4 / 3));
       const refreshToken = crypto.randomBytes(bytesNeeded).toString('base64url');
 
-      const persistedRefreshToken = await refreshTokenGateway.save({
+      return await refreshTokenGateway.save({
         token: refreshToken,
         expiresAt,
         ownerId,
       });
-
-      return persistedRefreshToken;
     },
 
     async validateRefreshToken(command) {
@@ -42,8 +47,16 @@ export function createTokenService(refreshTokenGateway: RefreshTokenGateway): To
         }
       }
 
+      const isValid = refreshToken.token === command.token;
+      if (!isValid) {
+        return {
+          isValid: false,
+          userId: null,
+        }
+      }
+
       return {
-        isValid: refreshToken.token === command.token,
+        isValid: true,
         userId: refreshToken.ownerId,
       };
     }

@@ -1,5 +1,5 @@
 import { CookieOptions } from "express";
-import { UserTokenPayload } from "../../../application/service/authentication";
+import { UserTokenPayload } from "../../../application/service/auth";
 import { RefreshToken } from "../../../domain/refreshToken";
 import { User } from "../../../domain/user";
 
