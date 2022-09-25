@@ -1,11 +1,22 @@
 import crypto from "crypto";
 import jwt from 'jsonwebtoken';
-import {RefreshTokenGateway, TokenUseCase} from '../ports';
+import { RefreshTokenGateway, TokenUseCase } from '../ports';
 
-export function createTokenService(refreshTokenGateway: RefreshTokenGateway): TokenUseCase {
+type TokenServiceOptions = {
+  accessTokenSecret: string;
+  accessTokenExpiresIn: string;
+  refreshTokenLength: number;
+  refreshTokenMaxAgeSeconds: number;
+};
+
+export function createTokenService(refreshTokenGateway: RefreshTokenGateway, options: TokenServiceOptions): TokenUseCase {
+  const { accessTokenSecret, accessTokenExpiresIn, refreshTokenLength, refreshTokenMaxAgeSeconds } = options;
+  if (!accessTokenSecret || !accessTokenExpiresIn || !refreshTokenLength || !refreshTokenMaxAgeSeconds) {
+    throw new Error('TokenServiceOptions are not valid');
+  }
   return {
     async sign(payload) {
-      return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+      return jwt.sign(payload, accessTokenSecret, { expiresIn: accessTokenExpiresIn });
     },
 
     async create(user) {
@@ -16,16 +27,16 @@ export function createTokenService(refreshTokenGateway: RefreshTokenGateway): To
     },
 
     async verify(token) {
-      return jwt.verify(token, process.env.JWT_SECRET);
+      return jwt.verify(token, accessTokenSecret);
     },
 
     async renewRefreshToken(ownerId) {
       const expiresAt = new Date();
-      const tokenLifetimeInDays = Number(process.env.REFRESH_TOKEN_LIFETIME_IN_DAYS);
+      const tokenLifetimeInDays = Number(refreshTokenMaxAgeSeconds) / 60 / 60 / 24;
       expiresAt.setDate(expiresAt.getDate() + tokenLifetimeInDays);
       console.log(expiresAt);
       
-      const tokenLength = Number(process.env.REFRESH_TOKEN_LENGTH);
+      const tokenLength = Number(refreshTokenLength);
       const bytesNeeded = Math.ceil(tokenLength / (4 / 3));
       const refreshToken = crypto.randomBytes(bytesNeeded).toString('base64url');
 

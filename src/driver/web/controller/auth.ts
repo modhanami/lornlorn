@@ -18,7 +18,12 @@ interface AuthController {
   refreshToken: RequestHandler;
 }
 
-export function createAuthController(authService: AuthenticationUseCase, tokenService: TokenUseCase, userService: UserUseCase): AuthController {
+type AuthControllerOptions = {
+  disableSecureCookies?: boolean;
+}
+
+export function createAuthController(authService: AuthenticationUseCase, tokenService: TokenUseCase, userService: UserUseCase, options: AuthControllerOptions): AuthController {
+  const disableSecureCookies = options.disableSecureCookies ?? false;
   return {
     async register(req, res) {
       const {email, username, password} = req.body;
@@ -111,15 +116,13 @@ export function createAuthController(authService: AuthenticationUseCase, tokenSe
       }
     }
   }
-}
 
 function setRefreshTokenCookie(res: Response, refreshToken: RefreshToken) {
-  const isSecureCookieDisabled = process.env.DISABLE_SECURE_COOKIES === "true";
-  console.log(isSecureCookieDisabled)
   res.cookie('refreshToken', refreshToken.token, {
     httpOnly: true,
-    secure: !isSecureCookieDisabled,
+      secure: !disableSecureCookies,
     sameSite: 'strict',
     expires: refreshToken.expiresAt,
   });
+}
 }
